@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아쿠아리움 (Aquarium) 퍼즐 게임</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐠</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 배경음악 오디오 (무한 루프) -->
+  <audio id="bgmAudio" src="bgm.mp3" loop preload="auto"></audio>
+
+  <!-- 배경 수족관 애니메이션 (물방울 및 빛 효과) -->
+  <div class="aquarium-bg" id="aquariumBg">
+    <div class="light-ray light-ray-1"></div>
+    <div class="light-ray light-ray-2"></div>
+    <div class="light-ray light-ray-3"></div>
+    <div class="bubbles-container" id="bubblesContainer"></div>
+    
+    <!-- 유영하는 물고기 SVG 실루엣 -->
+    <div class="swimming-fish fish-1">
+      <svg viewBox="0 0 100 50" width="80" height="40">
+        <path d="M10,25 C30,10 70,5 90,25 C70,45 30,40 10,25 Z M10,25 L0,10 L0,40 Z" fill="rgba(255,255,255,0.2)"/>
+        <circle cx="75" cy="22" r="3" fill="rgba(255,255,255,0.4)"/>
+      </svg>
+    </div>
+    <div class="swimming-fish fish-2">
+      <svg viewBox="0 0 100 50" width="60" height="30">
+        <path d="M10,25 C30,10 70,5 90,25 C70,45 30,40 10,25 Z M10,25 L0,10 L0,40 Z" fill="rgba(100,220,255,0.25)"/>
+        <circle cx="75" cy="22" r="2.5" fill="rgba(255,255,255,0.5)"/>
+      </svg>
+    </div>
+    <div class="swimming-fish fish-3">
+      <svg viewBox="0 0 100 50" width="100" height="50">
+        <path d="M10,25 C30,10 70,5 90,25 C70,45 30,40 10,25 Z M10,25 L0,10 L0,40 Z" fill="rgba(255,200,100,0.2)"/>
+        <circle cx="75" cy="22" r="3" fill="rgba(255,255,255,0.5)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- 메인 컨테이너 -->
+  <div class="app-container">
+
+    <!-- 1. 첫 화면: 시작 화면 -->
+    <section class="screen active" id="startScreen">
+      <div class="start-card glass-panel">
+        <div class="aquarium-badge">가야중학교 수학 퍼즐</div>
+        <h1 class="main-title">
+          <span class="clover">♣</span> 아쿠아리움 <span class="clover">♣</span>
+        </h1>
+        <p class="sub-title">바닷속 신비로운 수족관에 물을 채우는 두뇌 논리 퍼즐</p>
+
+        <div class="intro-illustration">
+          <div class="tank-demo">
+            <div class="demo-cell water waves"></div>
+            <div class="demo-cell water waves"></div>
+            <div class="demo-cell empty"></div>
+            <div class="demo-cell cross">✕</div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn btn-primary btn-large pulse-btn" id="btnStartGame">
+            <span class="btn-icon">🎮</span> 게임 시작
+          </button>
+          <button class="btn btn-secondary" id="btnShowRulesFromStart">
+            <span class="btn-icon">📖</span> 게임 규칙 보기
+          </button>
+          <button class="btn btn-outline" id="btnOpenStageSelectStart">
+            <span class="btn-icon">🗺️</span> 단계 선택 (1~19)
+          </button>
+        </div>
+
+        <div class="quick-mouse-guide">
+          <span>💡 <strong>마우스 조작:</strong> 왼쪽 클릭 = 💧 물 채우기 &nbsp;|&nbsp; 오른쪽 클릭 = ❌ X 표시</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 게임 규칙 화면 -->
+    <section class="screen" id="rulesScreen">
+      <div class="rules-card glass-panel">
+        <div class="screen-header">
+          <h2>📖 아쿠아리움 게임 규칙</h2>
+          <button class="btn-icon-only close-btn" id="btnCloseRules" title="닫기">✕</button>
+        </div>
+
+        <div class="rules-content">
+          <div class="rule-box">
+            <div class="rule-num">1</div>
+            <div class="rule-text">
+              <strong>수족관 격자</strong><br>
+              게임판은 정사각형 격자로 이루어져 있으며, <strong>굵은 테두리</strong>로 나뉜 여러 개의 ‘수족관’이 있습니다.
+            </div>
+          </div>
+
+          <div class="rule-box">
+            <div class="rule-num">2</div>
+            <div class="rule-text">
+              <strong>중력과 수위</strong><br>
+              각각의 수족관에 일정한 높이(수위)까지 물을 채우거나, 완전히 비워 둘 수 있습니다. 물은 <strong>바닥부터 차오릅니다.</strong>
+            </div>
+          </div>
+
+          <div class="rule-box">
+            <div class="rule-num">3</div>
+            <div class="rule-text">
+              <strong>동일한 수위의 법칙</strong><br>
+              각 수족관의 수위는 <strong>왼쪽 끝부터 오른쪽 끝까지 동일</strong>해야 합니다. 같은 수족관 안의 같은 가로줄 칸들은 모두 채워지거나 모두 비워져야 합니다.
+            </div>
+          </div>
+
+          <div class="rule-box">
+            <div class="rule-num">4</div>
+            <div class="rule-text">
+              <strong>격자 밖 힌트 숫자</strong><br>
+              격자 밖 숫자는 그 <strong>가로줄(행)이나 세로줄(열)에서 물로 채워야 하는 칸 수</strong>를 의미합니다.
+            </div>
+          </div>
+
+          <!-- 순차 진행 안내 -->
+          <div class="rule-box lock-rule-box">
+            <div class="rule-num lock-num">🔒</div>
+            <div class="rule-text">
+              <strong>단계별 해금 시스템</strong><br>
+              1단계를 통과해야 2단계로 넘어갈 수 있습니다! 앞선 단계를 완료하지 않으면 다음 단계가 열리지 않습니다.
+            </div>
+          </div>
+
+          <!-- 연습 문제 예시 안내 -->
+          <div class="example-section">
+            <h3>🔍 연습 문제로 원리 이해하기</h3>
+            <p class="example-desc">
+              아래는 학습지에 수록된 연습 문제와 정답입니다. 각 수족관(구획)마다 바닥부터 일정 높이까지 수평으로 물이 차오르고, 가로/세로 숫자의 합과 물 칸의 수가 정확히 일치함을 확인해보세요.
+            </p>
+            <div class="example-preview-container">
+              <div class="preview-box">
+                <span class="preview-badge">문제 판</span>
+                <div class="mini-grid" id="practiceProblemGrid"></div>
+              </div>
+              <div class="preview-arrow">➔</div>
+              <div class="preview-box">
+                <span class="preview-badge success-badge">정답 완성</span>
+                <div class="mini-grid" id="practiceSolutionGrid"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 조작 방법 강조 (좌클릭=물, 우클릭=X) -->
+          <div class="controls-guide-box">
+            <h4>🖱️ 게임 조작 방법</h4>
+            <div class="mouse-actions">
+              <div class="action-item">
+                <span class="mouse-badge left-click">왼쪽 클릭</span>
+                <span><strong>물 채우기 (💧)</strong> (다시 누르면 취소)</span>
+              </div>
+              <div class="action-item">
+                <span class="mouse-badge right-click">오른쪽 클릭</span>
+                <span><strong>X 표시 (❌)</strong> (물이 안 들어가는 칸)</span>
+              </div>
+              <div class="action-item">
+                <span class="mouse-badge touch-mode">터치 / 모바일</span>
+                <span>상단의 [💧물 채우기 / ❌X 표시] 모드 전환 버튼 사용</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rules-footer">
+          <button class="btn btn-outline" id="btnPlayPractice">연습 문제 직접 풀기</button>
+          <button class="btn btn-primary btn-large" id="btnGoToGame">1단계 시작하기 🚀</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 게임 플레이 화면 -->
+    <section class="screen" id="gameScreen">
+      <!-- 상단 정보 바 -->
+      <header class="game-header glass-panel">
+        <div class="header-left">
+          <button class="btn btn-sm btn-icon-only" id="btnHome" title="처음 화면으로">🏠</button>
+          <button class="btn btn-sm" id="btnOpenStageSelect">단계 목록</button>
+          <button class="btn btn-sm" id="btnOpenRulesInGame">규칙 보기</button>
+        </div>
+
+        <div class="header-center">
+          <div class="puzzle-title-wrap">
+            <span class="puzzle-level" id="puzzleTitle">1번 퍼즐</span>
+            <span class="puzzle-progress" id="puzzleProgress">(1 / 19)</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button class="btn btn-sm btn-icon-only" id="btnBgmToggle" title="배경음악 켜기/끄기">🎵</button>
+          <button class="btn btn-sm btn-icon-only" id="btnSoundToggle" title="효과음 켜기/끄기">🔊</button>
+          <button class="btn btn-sm btn-icon-only" id="btnUndo" title="되돌리기 (Undo)">↩️</button>
+          <button class="btn btn-sm btn-danger-soft" id="btnReset" title="현재 퍼즐 초기화">초기화</button>
+        </div>
+      </header>
+
+      <!-- 모바일 / 간편 모드 토글 바 -->
+      <div class="mode-toggle-bar glass-panel">
+        <span class="mode-label">입력 모드:</span>
+        <button class="mode-btn active" id="btnModeWater" data-mode="water">
+          <span class="mode-icon">💧</span> 물 채우기 <small>(좌클릭)</small>
+        </button>
+        <button class="mode-btn" id="btnModeCross" data-mode="cross">
+          <span class="mode-icon">❌</span> X 표시 <small>(우클릭)</small>
+        </button>
+      </div>
+
+      <!-- 퍼즐 보드 영역 -->
+      <main class="board-container">
+        <div class="puzzle-wrapper glass-panel">
+          <div class="board-grid" id="boardGrid">
+            <!-- 자바스크립트로 동적 생성 -->
+          </div>
+        </div>
+      </main>
+
+      <!-- 하단 액션 컨트롤 바 -->
+      <footer class="game-footer glass-panel">
+        <div class="footer-status-text" id="footerStatus">
+          <span>마우스 좌클릭: <strong>물 채우기</strong> | 우클릭: <strong>X 표시</strong></span>
+        </div>
+        <div class="footer-actions">
+          <button class="btn btn-outline" id="btnPrevPuzzle" title="이전 퍼즐">◀ 이전</button>
+          <button class="btn btn-primary btn-large check-btn" id="btnCheckAnswer">
+            <span class="btn-icon">✨</span> 정답 확인
+          </button>
+          <button class="btn btn-outline" id="btnNextPuzzle" title="다음 퍼즐">다음 ▶</button>
+        </div>
+      </footer>
+    </section>
+
+    <!-- 4. 엔딩 화면 (19개 모두 완성) -->
+    <section class="screen" id="endingScreen">
+      <div class="ending-card glass-panel">
+        <div class="trophy-animation">🏆</div>
+        <h1 class="ending-title">축하합니다!</h1>
+        <h2 class="ending-subtitle">모든 아쿠아리움을 완성했습니다!</h2>
+        <p class="ending-desc">
+          1단계부터 19단계까지 모든 수족관 퍼즐을 순서대로 통과한 진정한 아쿠아리움 마스터입니다! 🎉<br>
+          당신의 놀라운 논리력과 관찰력으로 모든 물고기들이 행복한 보금자리를 찾았습니다.
+        </p>
+        
+        <div class="ending-stats">
+          <div class="stat-pill">완성한 퍼즐: <strong>19개</strong></div>
+          <div class="stat-pill">달성 등급: <strong>마스터 (Master)</strong></div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn btn-primary btn-large" id="btnRestartFromBeginning">
+            처음부터 다시 도전 🔄
+          </button>
+          <button class="btn btn-secondary" id="btnOpenStageSelectEnding">
+            퍼즐 목록 둘러보기 🗺️
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 단계 선택 모달 (잠금 기능 적용) -->
+  <div class="modal" id="stageSelectModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog glass-panel">
+      <div class="modal-header">
+        <h3>🗺️ 퍼즐 단계 선택</h3>
+        <button class="btn-icon-only modal-close" id="btnCloseStageModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="stage-lock-notice">
+          💡 <strong>단계를 클리어해야 다음 단계가 열립니다.</strong> (자물쇠 🔒로 잠긴 단계는 선택할 수 없습니다.)
+        </div>
+
+        <div class="stage-section-title">기본 연습</div>
+        <div class="stage-grid practice-grid" id="stagePracticeList"></div>
+
+        <div class="stage-section-title">6x6 퍼즐 (1단계 ~ 16단계)</div>
+        <div class="stage-grid" id="stageList6x6"></div>
+
+        <div class="stage-section-title">10x10 마스터 퍼즐 (17단계 ~ 19단계)</div>
+        <div class="stage-grid" id="stageList10x10"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 오답 알림 토스트 -->
+  <div class="feedback-toast error-toast" id="errorToast">
+    <div class="toast-content">
+      <span class="toast-icon">🤔</span>
+      <div class="toast-text">
+        <strong>다시 해보세요.</strong>
+        <p>각 수족관의 수위 규칙이나 행/열 숫자를 다시 한 번 확인해보세요!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 잠금 알림 토스트 (잠긴 단계 접근 시) -->
+  <div class="feedback-toast lock-toast" id="lockToast">
+    <div class="toast-content">
+      <span class="toast-icon">🔒</span>
+      <div class="toast-text">
+        <strong>아직 열리지 않은 단계입니다!</strong>
+        <p id="lockToastMsg">이전 단계를 먼저 통과해야 다음 단계로 이동할 수 있습니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 정답 축하 모달 -->
+  <div class="modal success-modal" id="successModal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog glass-panel text-center">
+      <div class="celebrate-emoji">🎉</div>
+      <h2 class="success-title">정답입니다!</h2>
+      <p class="success-subtitle" id="successMessage">멋지게 수족관을 완성했습니다!</p>
+      <div class="success-actions">
+        <button class="btn btn-secondary" id="btnStayOnPuzzle">현재 판 보기</button>
+        <button class="btn btn-primary btn-large" id="btnNextPuzzleModal">다음 단계로 이동 ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 컨페티 색종이 캔버스 -->
+  <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+  <!-- 스크립트 로드 -->
+  <script src="puzzles.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
